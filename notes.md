@@ -186,3 +186,154 @@ Aprendemos que os estudos de arquitetura e DDD geralmente se complementam;
 Entendemos o que é DDD;
 Vimos que diversos conceitos de DDD já foram aprendidos no curso de Arquitetura;
 Conhecemos o termo Linguagem Ubíqua que consiste em ter uma linguagem onipresente entre a equipe de desenvolvimento e a equipe de negócios.
+
+#### 19/02/2024
+
+@@01
+Relação Aluno-Telefone
+
+[00:00] Boas-vindas de volta a mais um capítulo desse treinamento de introdução aos conceitos de DDD utilizando PHP. E agora nós vamos implementar uma regra de negócios bem simples, então esse vídeo vai ser bem curto e no próximo vídeo nós batemos um papo sobre o que acabamos fazendo aqui.
+[00:16] Chegou uma regra, o pessoal de negócios virou para equipe de TI e falou, “olha só os nossos alunos têm adicionado inúmeros telefones, só pelo fato de ter telefones para receber mensagens eles estão zoando amigos, colocando o telefone para os amigos receberem notificação. Então nós vamos adicionar uma regra onde cada aluno só pode ter dois telefones no máximo”.
+
+[00:39] Dessa forma, caso o aluno queira informar o telefone fixo e o celular ele vai conseguir, mas nada além disso vai ser utilizado, então nós só temos a possibilidade de ter dois telefones. E repara nisso tudo que eu falei, além de explicar o que nós vamos implementar, eu dei um motivo para nós implementarmos.
+
+[00:57] E quando temos a mentalidade do Design guiado a domínio, da implementação guiada a domínio, nós precisamos entender o que estamos fazendo. Porque eu poderia muito bem receber a ordem de alguém me falar: “Olha só, cada aluno só pode ter dois telefones.” E implementar de alguma forma que nunca isso possa ser mudado, alguma coisa do tipo sem entender o motivo dessa alteração.
+
+[01:20] Então é muito importante que nós sempre entendamos o que estamos fazendo para poder propor a melhor solução. No nosso caso é uma regra muito simples, mas mesmo assim nós precisamos entender o que estamos fazendo.
+
+[01:32] Agora vamos lá, se eu só posso ter dois telefones, antes de adicionar um telefone o que eu vou fazer, eu vou contar o número de telefones que esse aluno já tem. Caso esse número de telefones já seja maior ou igual a 2, eu vou lançar uma exceção, um erro, um problema.
+
+[01:49] E o que nós poderíamos fazer? E eu vou pedir para você fazer, criar uma exceção específica de aluno com dois telefones, ou algum nome que você acredita que faça sentido para o domínio, já que nós não temos uma pessoa especialista de domínios para falar conosco e definir esse nome, nós vamos ser também a pessoa especialista de domínio e inventar esse nome. Eu vou deixar a cargo de vocês criarem essa exceção como exercício.
+
+[02:17] Eu vou aqui lançar na linha 32 uma DomainException. Então, caso esse aluno já tenha dois telefones eu vou informar: Aluno já tem dois telefones. Não pode adicionar outro. Claro que essa mensagem poderia ser escrita de forma diferente, mais amigável, mas o ponto é nós implementamos uma regra muito simples de negócio, mas entendemos o motivo disso estar acontecendo.
+
+[02:48] E só um detalhe que eu esqueci de colocar o tipo de retorno na linha 29 no curso anterior, : self. Então beleza, isso que nós temos é uma invariância, ou seja, uma regra entre duas classes, uma regra entre um relacionamento. Eu sei que um aluno não pode ter mais que dois telefones. Então se o número de telefones já for 2, ele não pode adicionar outro.
+
+[03:14] Caso o número de telefones seja 0 ele consegue? Consegue! Caso o número de telefones seja um ele consegue? Sim! Se for dois, ele já não consegue mais adicionar.
+
+[03:23] E dois desafios então que vão ficar nesse vídeo. Um é criar uma exceção específica para esse caso, e o segundo é criar um teste para esse caso.
+
+@@02
+Invariantes
+
+É muito comum que na relação entre 2 (ou mais) classes hajam invariantes, mas...
+O que é uma invariante?
+
+São conceitos que não mudam, como por exemplo nomes de classes, etc.
+ 
+Alternativa errada! Essa não é a definição de uma invariante
+Alternativa correta
+É uma construção de linguagem, como variáveis e constantes
+ 
+Alternativa correta
+É uma regra de negócio que deve sempre ser verdadeira para os objetos serem válidos
+ 
+Alternativa correta! Se um aluno tiver mais do que 2 telefones em nosso sistema, essa regra foi violada, logo, o Aluno estará em um estado inválido. Invariantes nada mais são do que regras de negócio que precisam ser verificadas para garantir sua consistência.
+
+@@03
+Protegendo o acesso
+
+[00:00] Vou dar uma passada bem rápida em como eu implementei os testes. Eu fiz primeiro um setUp(), onde eu crio um aluno com o CPF e e-mail falsos, para não precisar me preocupar com o construtor e garantir que isso sempre vai funcionar, independente de qualquer regra.
+[00:18] Agora eu tenho aqui três testes. Um para garantir que mais de dois telefones, eu já vou ter uma exceção sendo lançada. Então eu espero que uma exceção do tipo que você criou seja lançada, caso eu tente adicionar três telefones. Eu também estou garantido que ao adicionar um telefone só, esse código da linha 36 está funcionando, e está sendo armazenado, eu tenho um único telefone. E no caso também com dois telefones.
+
+[00:42] Caso eu tivesse, por exemplo, uma invariância onde eu pudesse ter, pelo menos, até 5 telefones, eu não ia criar um teste para cada um desses casos, eu ia criar, como nós já vimos nos treinamentos relacionados a teste, um data provider. Se você não sabe do que eu estou falando, quando finalizar o treinamento corre lá e faz os treinamentos de testes.
+
+[01:05] Mas então, basicamente, eu criei esses testes e seu rodar, só para vocês verem que eu não estou enganando ninguém, os testes passam. Tem um dos testes implementados junto com nossa regra de negócios, vamos falar sobre o que nós fizemos aqui. Isso foi uma invariância. Ou seja, uma regra entre essas duas relações, uma regra de negócios na prática.
+
+[01:27] E quando eu tenho um objeto, uma classe, controlando o acesso às classes relacionadas, como por exemplo, de telefones, nós temos o que é chamado no mundo de DDD de aggregates ou agregados.
+
+[01:42] Um aluno, ele tem vários telefones e ele controla o acesso a esses telefones. Eu não consigo criar um telefone e adicionar no aluno, sem ser pelo método adicionarTelefone(), e somente dentro da classe aluno eu instancio um novo telefone. Eu não deveria vir na minha aplicação, por exemplo, e ao matricular um aluno, eu não deveria fazer $telefone = new Telefone () e adicionar lá.
+
+[02:14] Eu devo sempre criar telefones através do método adicionarTelefone() e isso faz com que aluno seja mais uma vez um agregado ou um aggregate. Então um aggregate é uma classe, uma entidade na prática, é uma entidade que possui objetos relacionados e esses objetos relacionados são controlados por ele.
+
+[02:36] Então dentro de uma relação entre agregados, o aluno é o que pode ser chamado de aggregate root, ou seja, a raiz de agregação. E a partir do aluno, que é a raiz dessa agregação, eu consigo acessar, eu consigo adicionar os objetos relacionados, que no caso são telefones.
+
+[02:57] Então essa invariância, que é a regra de negócios, adicionada a uma entidade, que é aluno, gera um relacionamento de agregados. No caso o aluno é um aggregate root, ou seja, raiz de agregação, e os telefones são seus relacionamentos.
+
+[03:13] É muito comum em livros ou vídeos, em vários materiais, serem explicados como tendo uma semelhança, certa relação, agregados ou aggregate roots, e coleções, ou seja, como se um aluno fosse uma coleção de telefones. Isso conceitualmente é errado. Um aluno não é somente uma coleção de telefones, por exemplo, um exemplo muito utilizado, é que uma turma que é um aggregate pode ter alunos, logo uma turma é uma coleção de alunos.
+
+[03:46] Só que uma turma pode ser muito mais do que só uma coleção de alunos, uma turma tem disciplinas, uma turma tem carga horária, uma turma tem informações referentes a ela própria. Então um aggregate root, ou um aggregate não é só uma coleção. Existe essa diferença muito clara, onde uma coleção nada mais é do que uma lista de dados, um conjunto de dados, onde só os dados individuais possuem informações específicas.
+
+[04:13] Já em um aggregate, o aggregate em si tem informações próprias, e não somente cada item desse aggregate. Então nesse nosso caso, você provavelmente nem cogitou a possibilidade da relação entre um aggregate e uma coleção.
+
+[04:29] Você sabe que um aluno não é uma mera coleção de telefones, mas em alguns exemplos quando você for pesquisar mais sobre aggregates, e eu tenho certeza que você vai pesquisar mais sobre o assunto, você pode acabar vendo explicações que confundem esses dois termos. Então você já sabe que não é muito bem por aí. Aggregate root tem coleções, mas não é uma coleção. Nosso aluno tem uma coleção de telefones, seja uma lista, um array, um conjunto, o que for, mas ele possui uma coleção, e não é uma coleção.
+
+[05:02] Então, recapitulando, o que nós fizemos nesse código na prática foi criar uma raiz de agregação, um aggregate root, onde nosso aluno controla todo o acesso à classe de telefone. Então eu só consigo adicionar um telefone através da classe aluno, eu só consigo recuperar telefones através da classe de aluno e, inclusive, em algumas linguagens existe uma feature, existe uma funcionalidade, onde eu consigo criar classes dentro de outras classes.
+
+[05:32] Então nesses casos, é bastante comum que esse tipo de coisa aconteça, eu criasse uma classe dentro da classe aluno, já que eu sei que um telefone só pode existir dentro de aluno, isso é comum de acontecer. O PHP não permite isso, mas ele permite algo bastante semelhante que é, com o nosso autoloader configurado, adicionar uma outra classe Telefone, e essa classe Telefone não vai estar acessível em nenhum outro lugar diretamente.
+
+[06:02] O nosso autoloader não consegue achar essa classe Telefone, então para eu achar ela eu terei que fazer aquele require, fazer o nosso código um pouquinho mais feio entre aspas. Só que isso não é uma boa prática, isso fere algumas recomendações “PSRs”, então o que normalmente você vai ver sendo feito em PHP?
+
+[06:23] Ter essa raiz de agregação, ter o aggregate root aqui configurado, mas, mesmo assim, a classe de telefone é uma classe a parte, eu conseguiria instanciar um telefone por si só, isso não vai ser proibido explicitamente, mas, na prática, todos os nossos use cases, todos os nossos serviços vão utilizar o método no aggregate root para conseguir manipular os telefones.
+
+[06:48] Por exemplo, se eu quisesse alterar um telefone eu não buscaria os telefones, e aí um item do array eu alteraria diretamente. Caso fosse possível na nossa aplicação alterar telefones, eu teria um método como, por exemplo, alteraNumeroTelefone, eu recebo o $indice, ou seja, a posição na minha coleção, e o $novoNumero e faria algo do tipo.
+
+[07:15] Então nós sempre controlamos todo o acesso as entidades relacionadas aos value objects relacionados a um aggregate root através de métodos do próprio aggregate root. Nada fora desse aggregate root vai alterar os telefones.
+
+[07:31] Então esse é o conceito de aggregate root, esse é o conceito de agregados, você deve estudar mais sobre esse assunto, que é um assunto mais amplo, mas esse é o básico que nós precisamos saber para dar continuidade no treinamento e nos estudos sobre DDD. No próximo vídeo, vamos falar um pouco mais sobre a persistência de aggregate roots, a persistência desses objetos agregados.
+
+@@04
+Para saber mais: Aggregates
+
+O termo Aggregate já foi citado em treinamentos anteriores, mas como recordar é viver, deixo aqui um breve artigo do Martin Fowler sobre o assunto: https://martinfowler.com/bliki/DDD_Aggregate.html
+
+@@05
+Persistência de aggregates
+
+[00:00] Vamos falar um pouco, e bem pouco mesmo sobre persistência de aggregate roots.
+[00:08] O que acontece? Um aluno controla todo o acesso aos telefones, ou seja, sempre que eu salvar um aluno faz sentido que eu salve também todos os telefones. E caso eu precise, caso nosso negócio permita remover um telefone de um aluno, eu teria, por exemplo, um método public function removerTelefone() onde eu receberia o DDD e o número e, para eu salvar, para eu persistir isso no banco de dados, eu precisaria atualizar meu aluno.
+
+[00:40] Eu não iria lá no banco de dados, através de um repositório, eu não acessaria o método deletar telefone, eu não acessaria um repositório de telefones e chamar o método "remover", não. Eu faço todo esse acesso também através de um repositório do aggregate root. Porque, mais uma vez, um aggregate root, a raiz de agregação, controla todo o acesso aos seus objetos relacionados, inclusive quando nós falamos de persistência.
+
+[01:12] Então ao adicionar um aluno no “RepositorioDeAlunoComPdo.php”, eu também preciso adicionar todos os telefones, e aqui entra um detalhe muito importante e esse é um estudo muito mais aprofundado, inclusive vale muito a pena a leitura sobre esses detalhes, só que eu não vou entrar muito aqui nesses detalhes.
+
+[01:30] Mas, basicamente, nós precisamos de algumas formas de garantir que os telefones vão ser inseridos corretamente. Caso algum telefone não seja inserido eu preciso cancelar a inserção dos alunos, e você provavelmente está pensando: “Vinicius, é só utilizar transações”. E sim, 90% das vezes utilizar uma transação resolve o problema, então basta que essa conexão que nós estamos recebendo esteja com uma transação aberta para que esse método já funcione.
+
+[02:00] Só que existem casos complexos, porque uma raiz de agregação pode conter muito mais invariantes, nós às vezes podemos acabar precisando garantir invariantes no mecanismo de persistência. Então esses detalhes mais complexos, não vale a pena abordar nesse curso, senão isso se tornaria um treinamento de banco de dados. Porque aqui nós entramos em estratégias otimistas ou pessimistas de travamento de tabelas, esse tipo de detalhe muito específico de cada mecanismo de persistência.
+
+[02:31] Mas a leitura e a pesquisa desses detalhes são muito importantes, então eu recomendo muito que você estude, seja qual for o mecanismo de persistência utilizado, como você pode tratar a consistência dos dados. Por exemplo, ao atualizar um aluno para garantir que todos os telefones foram atualizados também, existe uma estratégia de persistência e de consistência que consiste em adicionar uma coluna no banco de dados que armazena a versão.
+
+[03:00] E cada vez que atualizar um aggregate root, eu preciso reinserir os telefones ou atualizá-los também para ter a versão batendo. Então esse estudo é muito interessante, mas foge do foco desse treinamento, que é específico sobre DDD com PHP. Mas eu não poderia deixar de falar aqui, é responsabilidade do repositório do aggregate root persistir os seus objetos relacionados também.
+
+[03:27] E obviamente nós poderíamos ter, por exemplo, um repositório de telefone. Onde ao invés de fazermos esses SQL aqui nós chamaríamos o método desse repositório. Mas de qualquer forma nos nossos applications services, nós só chamaríamos o repositório de aluno.
+
+[03:48] Então com esses conceitos em mente, você pode reparar que no estudo de arquitetura, já implementamos boa parte do que o DDD sugere. O que falta, são detalhes. Por exemplo, esses detalhes mais complexos de persistência. E aí o estudo de banco de dados seria necessário, nós precisaríamos acabar escolhendo um mecanismo específico para implementar no código. Mas nós já implementamos boa parte.
+
+[04:13] Se recebermos uma conexão como uma transação aberta, 90% dos problemas já foram resolvidos pelo simples fato de nós termos estudado bem sobre arquitetura.
+
+[04:23] Então repara como esses dois temas se conversam o tempo todo. Se nós estudamos muito DDD, naturalmente vamos estudar muito sobre a arquitetura. Se estudamos muito sobre arquitetura, em algum momento vamos acabar estudando sobre DDD. Então essa que é a beleza do estudo da arquitetura de software, muitos conteúdos, muitos estudos, se completam.
+
+[04:45] Então nós vimos mais um caso, onde o simples fato de nós termos estudado arquitetura e implementado padrões arquiteturais, já entregaram para nós detalhes de consistência. É muito fácil manter esse método, e nossa raiz de agregação consistente, no nosso caso.
+
+[05:00] Então mais uma vez, recapitulando, uma raiz de agregação deve controlar o acesso aos objetos relacionados, então eu só consigo acessar telefones através da classe aluno.
+
+[05:14] Uma invariância é uma regra, que deve sempre ser verdadeira, então preciso validar sempre que eu adicionar um telefone, que eu não vou ter mais de dois. E uma entidade que possui invariâncias nos seus relacionamentos, vira uma raiz de agregação. E se é uma raiz de agregação, a persistência também precisa ser feita de um ponto central. A raiz de agregação que tem seu repositório, vai cuidar da persistência dos objetos relacionados.
+
+[05:43] Com isso em mente, fica mais uma vez a sugestão de leitura sobre mecanismo de consistência os mecanismos de persistência, ou seja, como garantir a consistência dos dados utilizando SQL. Seja com transações, com mecanismos pessimistas ou otimistas de consistência, com lock de tabela, conversionamento no banco. Com essas técnicas vale a pena a leitura sobre isso.
+
+[06:09] E agora que nós já entendemos essa parte mais complexa, porque embora eu esteja passando o superficial, o básico, para nós entendermos o conceito, existe muito estudo por trás, e só a leitura, aquelas literaturas mais clássicas vão trazer esse conhecimento para nós. Obviamente, no final do treinamento eu vou deixar algumas referências, mas o básico que nós precisamos entender por enquanto é isso.
+
+[06:33] Agora vamos falar um pouco sobre um outro bloco de construção muito importante do DDD, uma outra técnica muito utilizada para continuarmos tratando nosso domínio da aplicação como ponto central, o domínio do nosso software como ponto central. Então vamos conversar no próximo capítulo sobre eventos.
+
+@@06
+Para saber mais: Relacionamentos
+
+Até aqui nós fizemos alguns relacionamentos entre agregados, porém existe uma regra interessante a ser seguida nesses casos.
+Quando vamos relacionar 2 aggregates, não devemos ter a instância deles se relacionando, mas sim apenas as suas identidades. Nesta discussão aqui no fórum esse ponto foi levantado: https://cursos.alura.com.br/forum/topico-referencias-em-agregados-149004
+
+@@07
+Faça como eu fiz
+
+Chegou a hora de você seguir todos os passos realizados por mim durante esta aula. Caso já tenha feito, excelente. Se ainda não, é importante que você execute o que foi visto nos vídeos para poder continuar com a próxima aula.
+
+Continue com os seus estudos, e se houver dúvidas, não hesite em recorrer ao nosso fórum!
+
+@@08
+O que aprendemos?
+
+O que aprendemos nessa aula:
+Conhecemos o conceito de Aggregates;
+Entendemos o que é uma invariante;
+Vimos que persistência de Aggregates é um assunto complexo;
+Há detalhes de consistência;
+Optimist e Pessimist locking são conceitos mais avançados sobre o assunto;
