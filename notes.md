@@ -337,3 +337,186 @@ Entendemos o que é uma invariante;
 Vimos que persistência de Aggregates é um assunto complexo;
 Há detalhes de consistência;
 Optimist e Pessimist locking são conceitos mais avançados sobre o assunto;
+
+##### 20/02/2024
+
+@03-Evento de domínio
+
+@@01
+Projeto da aula anterior
+
+Caso queira, você pode baixar aqui o projeto do curso no ponto em que paramos na aula anterior.
+
+https://caelum-online-public.s3.amazonaws.com/1822-DDD-PHP/02/DDD-PHP-projeto-aula-2-completo.zip
+
+@@02
+Eventos de domínio
+
+[00:00] Boas-vindas de volta a mais um capítulo desse treinamento de introdução aos conceitos de DDD utilizando PHP. E nós já vimos vários blocos de construção, vários dos padrões táticos do DDD, as entidades, os value objects, etc. E agora está na hora de nós vermos um bloco de construção que é um dos mais importantes do design orientado ao domínio, do DDD, que é a parte de eventos. Então antes de tudo vamos definir o que é um evento.
+[00:30] Nós que somos desenvolvedores PHP não estamos tão habituados, por padrão, a trabalhar com eventos, mas se você já trabalha com JavaScript, por exemplo, você sabe que um evento é algo que acontece e nós por algum motivo estamos interessados nele.
+
+[00:44] Por exemplo, quando o usuário clica em um botão, é disparado um evento de click. Quando um usuário passa o mouse em cima de algum, lugar é disparado um efeito de mouse over. Então eventos são algo que acontece e alguém precisa ser notificado daquilo. Então um evento de domínio é algo que acontece no domínio da nossa aplicação e que alguém vai precisar ser notificado disso. Basicamente é isso.
+
+[01:11] Então pensando de forma bem rápida, que evento no nosso domínio pode acontecer, o que nós podemos ter aqui?
+
+[01:18] Já está aberto, e foi honestamente por acaso, um caso de uso aqui chamado “MatricularAluno”. Quando um aluno é matriculado acontece exatamente isso que eu acabei de falar, aluno matriculado. Então nós já temos esse evento modelado na nossa mente. Eu sei que ao executar esse caso de uso, eu vou ter um evento acontecendo, que é o evento do aluno matriculado.
+
+[01:43] Então vamos colocar isso na prática, vamos criar essa classe que representa um evento. E já que é um evento de domínio, ele vai ficar na nossa camada de domínio. Como ele está relacionado ao aluno, ele vai ficar no nosso módulo de aluno.
+
+[01:56] Então vamos nessa, “New > PHP Class > Name: AlunoMatriculado”. Existem algumas opções e algumas regras para criarmos os nomes dos nossos domínios. Por padrão, e faz todo sentido, isso deve representar uma ação e não, por exemplo, matricular aluno também. Não é para representar algo que nós vamos fazer, mas sim algo que aconteceu.
+
+[02:28] Então nós podemos representar dessa forma, como “AlunoMatriculado”, ou utilizar o passado, como “AlunoFoiMatriculado”. Isso deixa ainda mais claro que isso é um evento, só que é um pouco mais incomum você encontrar esse tipo de nomenclatura. Eu, Vinicius, uma opinião pessoal, eu acho que da segunda forma fica mais legível.
+
+[02:51] Mas como nós encontramos com menos frequência, eu vou utilizar o que nós vemos com maior frequência que é “AlunoMatriculado”, “UsuárioCriado”, “PedidoFeito”, esse tipo de coisa. Então essa é a forma mais comum de nomearmos evento de domínio. Deixa eu fechar isso aqui.
+
+[03:10] O que um evento de domínio precisa ter? Eu preciso ter alguma informação para encontrar o aluno, para eu saber qual aluno foi matriculado. Eu também preciso ter, e isso é para qualquer evento, eu preciso saber quando esse evento aconteceu. Se eu preciso saber sempre essa informação sobre o domínio, vamos inclusive criar, por enquanto, vamos tratar mais sobre esse assunto depois, mas por enquanto aqui na raiz de domínio, vamos chamar de "Evento".
+
+[03:37] “New > File > PHP Class > Name: Evento”. Vou criar essa interface, onde nós vamos precisar sempre informar o momento em que aconteceu esse evento. E isso vai ser um DateTimeImmutable(), eu vou forçar que isso deve ser sempre imutável. Porque, e aí vamos recapitular o que nós já vimos sobre eventos.
+
+[04:01] Um evento é algo que aconteceu, então ele tem que estar no passado, aluno foi matriculado, ou aluno matriculado, pedido feito, esse tipo de coisa. Um evento possui um momento em que ele aconteceu. Então nós já definimos nessa interface que nós vamos implementar. E um evento de domínio deve ser imutável, o que isso quer dizer? A partir do momento que eu crio um objeto utilizando a classe AlunoMatriculado, nenhum dos seus valores pode ser alterado.
+
+[04:32] Ele só pode receber valores, informar esses valores, mas nunca será alterado. Então essa classe também vai ser imutável. E por isso eu estou deixando a data como algo imutável. Então vamos nessa, vamos implementar todos esses conceitos.
+
+[04:48] Eu sei que meu AlunoMatriculado é um evento e eu preciso informar o momento desse evento. Então vamos lá, no nosso construtor, ou seja, assim que nós criarmos esse evento AlunoMatriculado, o momento vai ser o momento atual, o date time atual. Vamos criar então DateTimeImmutable $momento. Criei essa propriedade, no construtor eu estou inicializando ela, então no nosso método eu simplesmente retorno.
+
+[05:24] Recapitulando mais uma vez, para tudo ficar muito claro, eu sei que todo evento acontece em algum momento, então eu preciso fornecer esse momento para quem precisar. Então sempre que eu criar esse evento, ou seja, no construtor. Eu vou definir que o momento é o momento atual utilizando o DateTimeImmutable()
+
+[05:43] Só que o evento de AlunoMatriculado precisa de alguma informação que me permita identificar esse aluno, que me permita encontrar esse aluno, seja como for. E qual é a identificação de um aluno, como eu consigo identificar um aluno? Através de um CPF. Então sempre que eu criar um evento do tipo AlunoMatriculado, eu vou receber o CPF do aluno. Então vamos inicializar isso daqui.
+
+[06:13] Se eu tenho esse dado chegando, eu preciso fornecer ele de alguma forma. Então vamos lá, public function cpfAluno(): Cpf. Eu vou fornecer esse dado. “Vinicius, por que você não recebe o aluno como um todo?” Porque dessa forma, eu vou estar quebrando o encapsulamento do meu domínio, eu posso acabar fornecendo para alguém que não está no meu domínio de aluno, seja lá um domínio de financeiro, ou algo do tipo, informações que eles não precisam.
+
+[06:40] Então eu vou permitir que essa classe nova que vai ouvir esse evento de AlunoMatriculado, eu vou acabar permitindo que essa classe adicione telefone, que essa classe faça manipulações que ela não precisa fazer. Então tudo que eu preciso informar é uma forma de ela encontrar esse aluno. Então vamos lá fornecer o CPF do aluno.
+
+[07:03] Com isso, já temos a definição do nosso evento de domínio. Eu consigo fazer com que eu represente o evento de que um aluno foi matriculado, o evento AlunoMatriculado. A partir desse evento eu sei quando ele aconteceu, e eu sei qual é o CPF do aluno que foi matriculado. Então já tenho todas as informações necessárias para esse evento de domínio fazer sentido.
+
+[07:32] Só que por enquanto ele é inútil. Eu ainda não tenho nada sendo feito com ele, então vamos ver como que nós podemos fazer para, por exemplo, reagir a esse evento, como nós podemos fazer para lançar, para emitir esse evento, para fazer com que esse evento aconteça, vamos implementar a parte prática de um evento de domínio.
+
+@@03
+Motivação
+
+Sabemos o que é um evento e aprendemos o que é um evento de domínio.
+Qual a motivação para termos eventos de domínio em nossa aplicação?
+
+Poder programar nossa aplicação para reagir a eventos de forma flexível
+ 
+Alternativa correta! Trabalhando com eventos, o mesmo evento pode gerar várias ações, o que nos dá muita flexibilidade
+Alternativa correta
+Poder nos lembrar como é programar com JS onde há eventos do DOM
+ 
+Alternativa correta
+Aplicar design patterns se torna muito mais fácil utilizando eventos de domínio
+
+@@04
+Reagindo a eventos
+
+[00:00] Vamos começar a implementar a reação a esse evento, vamos implementar uma classe que vai ouvir o evento AlunoMatriculado e vai reagir a ele.
+[00:15] Então vamos nessa, o que nós precisamos. Vamos criar aqui esse ouvinte “Aluno > New > PHP Class > Name: LogDeAlunoMatriculado”. Sempre que acontecer esse evento, essa classe vai reagir ao evento AlunoMatriculado e realizar um log.
+
+[00:33] Então vamos lá, como essa classe reage ao evento AlunoMatriculado, exatamente esse vai ser o nome do meu método. Já tenho o método criado, reageAo(AlunoMatriculado $alunoMatriculado) : void. Esse é o evento que esse ouvinte de evento, vamos chamar assim, vai reagir.
+
+[00:57] Então o que eu vou fazer? Eu só vou jogar na saída padrão, ou seja, eu vou exibir no terminal uma mensagem. Então fprintf(), o que isso faz? Escreve em algum arquivo, e esse arquivo vai ser a saída padrão do sistema, que é o terminal.
+
+[01:19] Eu estou mandando para saída de erro só para vocês terem familiaridade com esse conceito, e vale a pena estudar sobre saída padrão, entrada de dados, isso são conceitos de sistema operacional, então acho que vale a pena nós citarmos isso. Mas na prática, isso tudo que eu vou fazer é mesma coisa do que fazer um echo.
+
+[01:39] Então vamos lá, eu vou formatar uma string, e eu vou dizer que Aluno com CPF %s foi matriculado na data %s sendo %s uma string qualquer. Agora vamos passar essa string aqui, vai ser (string) $salunoMatriculado -> cpfAluno(). E essa segunda string vai ser a data formatada, então $alunoMatriculado->momento()->format: (‘d/m/y’).
+
+[02:13] Vamos recapitular o que eu estou fazendo, na prática, eu tenho uma classe que vai realizar o LogDeAlunoMatriculado, e ela reage ao evento AlunoMatriculado. Quando ela reagir ao evento AlunoMatriculado, ela vai exibir na saída de erro, ou seja, no terminal, essa seguinte mensagem: “Aluno com CPF tal foi matriculado na data tal”. E o CPF tal, vai ser o CPF do aluno matriculado. A data vai ser o momento em que aconteceu o evento aluno matriculado.
+
+[02:46] Então nós já temos, de forma bastante simples, a implementação desse ouvinte. E nós vamos ver agora, nós precisamos entender, como que fazemos para emitir esse evento, para publicar esse evento. E para deixar essa parte de publicação de eventos e de ouvir eventos um pouco mais genérica, nós vamos precisar fazer algumas modificações pequenas no código, mas vamos ver sobre isso no próximo vídeo.
+
+@@05
+Publicando eventos
+
+[00:00] Agora vamos implementar, como nós podemos emitir esse evento, como que nós podemos publicar o evento AlunoMatriculado.
+[00:10] Então vamos de novo no nosso domínio, começar a pensar na classe publicador de eventos. “Domínio > New > PHP Class >Name: PublicadorDeEvento”. O que essa classe vai fazer? Nessa classe eu consigo adicionar ouvintes, faz todo sentido. public function adicionarOuvinte(), e eu preciso informar quais são os ouvintes.
+
+[00:34] Vamos com calma, vai ser um array $ouvintes, que vai iniciar vazio, e ao adicionar um ouvinte, não vou informar o tipo ainda, eu vou sempre adicionar ao meu array de ouvintes, esse $ouvinte.
+
+[00:50] Ou seja, eu posso ter vários ouvintes de evento, inclusive vários ouvintes para o mesmo evento, então sempre que eu quiser informar que eu tenho um ouvinte para determinador evento, eu adiciono ele utilizando esse método aqui.
+
+[01:04] E agora, para publicar, posso criar o método publicar(), e o que eu vou publicar? Um evento. Vou publicar um evento e para cada um dos nossos ouvintes, como foreach ($this => ouvintes as $ouvintes), eu vou fazer o quê? “Ouvinte, processa esse evento”. $ouvinte->processa(evento).
+
+[01:31] Agora vamos para a parte realmente prática, eu consigo publicar esse evento, mas qual o tipo desse ouvinte? Vai ser sempre esse LogDeAlunoMatriculado? Não! Então eu preciso de um tipo mais abstrato, que saiba processar um evento. E além disso, eu preciso saber se eu vou querer ou não ouvir o evento que está sendo publicado.
+
+[01:52] Porque, por exemplo, imagina que eu publique o evento alunoIndicado, esse ouvinte aqui não precisa responder esse evento, não precisa reagir. Então nós precisamos desse tipo de informação também.
+
+[02:05] Então vamos lá, criar no domínio mais uma classe, “Domínio > New > PHP Class > Name: OuvinteDeEvento”, essa classe OuvinteDeEvento, vai ser uma classe abstrata, que vai ter o método public function processa(Evento $evento). Vai processar um evento onde, if ($this => sabeProcessar($evento)) caso essa classe saiba processar esse evento, então ela vai reagir ao evento $this => reageAo$evento).
+
+[02:45] Só que esses dois métodos não existem, então vamos criar. abstract public function sabeProcessar, que vai retornar um bool e recebe um $evento. E temos também o reageAo(Evento $evento), que não retorna nada.
+
+[03:16] Temos esses métodos, então eu sei que o nosso PublicadorDeEvento vai receber sempre OuvinteDeEvento e para cada um dos ouvintes, ele vai chamar esse método processa. Então o método processa pergunta se o se o ouvinte atual sabe processar o evento e se souber, reage.
+
+[03:38] Então aqui no nosso LogDeAlunoMatriculado, nós precisamos estender o OuvinteDeEvento, implementar os métodos necessários, o sabeProcessar. Como que eu identifico se o ouvinte sabe processar um evento? É só eu verificar se esse evento é do tipo, ou seja, a instância dele é de AlunoMatriculado. Caso seja, ele sabe processar.
+
+[04:04] Eu não posso receber direto AlunoMatriculado, porque um OuvinteDeEvento recebe um evento qualquer. Então eu preciso mudar para evento, só que nem todo evento tem CPF do aluno. Então nós vamos fazer com que um $alunoMatriculado receba, nós poderíamos fazer um typecast, ou eu posso simplesmente informar, que esse evento é do tipo AlunoMatriculado sempre.
+
+[04:33] Porque eu sei que esse método só vai ser chamado quando eu tiver um AlunoMatriculado, então eu estou informando que método sempre recebe esse evento AlunoMatriculado, um evento deste tipo.
+
+[04:43] Então agora vamos recapitular tudo que nós fizemos, nós criamos um publicador de eventos, esse publicador de eventos, recebe vários ouvintes eu posso adicionar quantos ouvintes eu quiser, e eu publico algum evento, também não retorna nada, posso publicar algum evento. Quando eu publicar, ele vai percorrer toda a lista de ouvintes e chamar o método processa, inclusive deixa eu adicionar o tipo para o “phpstorm” me ajudar, OuvinteDeEvento.
+
+[05:12] Então o nosso método processa, faz o quê, pergunta: “Olha, eu sei processar esse evento? Essa classe sabe processar esse evento? Se souber, reage a ele.” Então no nosso LogDeAlunoMatriculado, o que nós estamos fazendo, ele sabe processar um evento, caso a instância dele seja AlunoMatriculado. Então se for, nós podemos reagir a esse evento que vai simplesmente fazer um log.
+
+[05:36] Então com isso tudo configurado, o que nós vamos fazer, nós vamos configurar um publicador de eventos, então $this->publicador = new PublicadorDeEvento(), isso tudo na nossa camada de aplicação, o nosso MatricularAluno vai fazer isso por enquanto. E nesse publicador o que eu vou fazer, eu vou adicionar um ouvinte, que é um new LogDeAlunoMatriculado.
+
+[06:03] Então vamos adicionar esse atributo. Temos aqui um publicador de evento. Então sempre que executar o MatricularAluno, etc, eu vou no meu publicador, publicar um novo evento, que é AlunoMatriculado. E esse AlunoMatriculado, eu sei que ele tem esse cpfAluno. Só que aqui entrou um problema. Eu não posso pegar essa string, então vou pegar o CPF do aluno.
+
+[06:34] Só que entra aqui um detalhe, que o CPF do aluno está sendo devolvido como string, e eu preciso do CPF em si. Então vou passar a devolver esse CPF. Então vamos voltar no nosso use case. E estou publicando o evento AlunoMatriculado. Deixa eu separar essa linha 28 para ficar um pouco mais legível.
+
+[07:00] Recapitulando mais uma vez, porque eu sei que isso é um assunto um pouco denso, deixa até fechar a barra lateral. Sempre que eu executar a ação de matricular um aluno, eu vou configurar que o meu PublicadorDeEvento vai ter esse ouvinte da linha 28, de LogDeAlunoMatriculado, e quando eu terminar de adicionar esse aluno, ou seja, matriculei ele, eu vou publicar esse evento.
+
+[07:22] Então quando eu executar esse MatricularAluno, eu sei que aquele log vai acontecer. Mas provavelmente você está se perguntando: “Vinícius que trabalheira, eu poderia copiar essa linha aqui e colar no meu MatricularAluno.php, sem criar esse monte de classe.”
+
+[07:39] Pois é, só que eu vou deixar bem claro alguns detalhes. Quando você for criar uma aplicação dessa para o mundo real, você não vai configurar o PublicadorDeEvento em cada um dos seus use cases, em cada um dos application services. Você vai usar, como nós vimos no treinamento de MVC, você vai usar um container de injeção de dependência.
+
+[07:58] Então ao invés de criar o PublicadorDeEvento, nós vamos receber um PublicadorDeEvento todo configurado, com todos os ouvintes necessários. Então nós só inicializamos ele, $publicador, e com esse PublicadorDeEvento todo configurado, nós só publicamos o evento.
+
+[08:20] Nós não precisamos saber o que vai acontecer, se vai um log do aluno matriculado, se esse evento vai ser salvo no banco de dados, se isso vai gerar uma requisição para uma nova API que vai informar que um aluno foi matriculado numa aplicação diferente.
+
+[08:36] Então nós não precisamos saber disso, no nosso container de injeção de dependência nós podemos configurar isso, se nós estamos utilizando algum framework, nas configurações do framework, nós podemos informar esse tipo de detalhe. Então nós ganhamos, e muito, em flexibilidade. E além de ganhar em flexibilidade para o próprio sistema, nós conseguimos facilitar a comunicação entre sistemas diferentes.
+
+[09:01] Eu posso simplesmente emitir um evento, e esse evento vai ter algum ouvinte que faz uma requisição para outro sistema, de forma muito simples, de forma muito facilitada. Então vamos inclusive ver se isso tudo está funcionando por enquanto aqui com esse nosso matricular-aluno.php.
+
+[09:18] Vamos reescrever ele, para não chamar diretamente, para chamar aquele nosso MatricularAluno, que é aquele use case de MatricularAluno. Vamos fazer esse comando funcionar agora.
+
+[09:32] Ele recebe um repositório de aluno, RepositorioDeAlunoEmMemoria então vai ser um repositório em memória. Ele recebe também um publicador, e vamos lá criar esse $publicador, de novo, isso seria feito no container de injeção de dependência, eu vou fazer direto nesse arquivo de teste mesmo por brevidade, para ficar tudo mais rápido.
+
+[09:52] Então esse publicador vai ter um novo ouvinte, que é o LogDeAlunoMatriculado , importei. Agora esse $useCase, eu posso executar com os dados Dto, MatricularAlunoDto. Eu vou ter o $cpf do aluno, o $nome do aluno, e o $email do aluno. Ponto, vou executar, e teoricamente eu preciso receber uma mensagem escrita “Aluno com CPF tal, foi matriculado na data, dia 23 de Maio.”
+
+[10:34] Então vamos executar isso aqui, php matricular-aluno.php, e aqui o CPF, “123.456.789-10”, o nome que é Vinícius Dias, e o e-mail que é um meio de exemplo qualquer, e pronto. “Aluno com CPF, CPF que eu digitei, foi matriculado na data tal”. Então nós ganhamos uma inflexibilidade que, caso eu queira, que ao matricular um aluno esse evento seja enviado para uma nova API, eu crio uma classe nova, e adiciono como ouvinte.
+
+[11:09] Então eu não preciso editando o código existente, e isso entra naqueles conceitos que nós já trabalhamos bastante sobre solid. Então repara que esse curso, por ser um curso mais avançado, tem vários requisitos, como os requisitos de arquitetura, dos cursos de MVC, dos cursos de solid, então nós precisamos ter os conceitos de orientação objetos muito bem claro na nossa cabeça, para conseguir aplicar tudo isso corretamente.
+
+[11:38] Então vamos mais uma vez, eu sei que essa aula foi densa, então vamos recapitular o que nós fizemos. Um domínio possui eventos, coisas que acontecem no domínio, como, por exemplo, um aluno matriculado. Esse aluno matriculado, esse evento tem a informação para eu conseguir identificar esse aluno e quando isso aconteceu. Definimos o que é um domínio. Nós vimos como reagir a esse evento.
+
+[12:04] Então para identificar se eu sei ou não processar determinado evento, eu identifico o tipo dele, então eu estou informando que sim, eu sei processar esse evento, então eu vou reagir a ele exibindo uma mensagem, nada além disso.
+
+[12:16] Só que para publicar esse evento, nós precisamos, cadê o nosso publicador, nós precisamos ter ouvintes, e para cada um desses ouvintes, quando nós publicarmos, nós vamos pedir para ele processar o evento. Então foi exatamente isso que nós fizemos, e nós configuramos um PublicadorDeEvento.
+
+[12:34] Mais uma vez, em uma aplicação real, você teria em um ponto só da aplicação, em um ponto central, como, por exemplo, o container de injeção de dependências e teria com vários ouvintes, vários. Um ouvinte para fazer log de eventos, um ouvinte para persistir eventos, um ouvinte que vai executar ações específicas, como, por exemplo, enviar um e-mail quando aluno foi matriculado, enviar um e-mail quando o aluno for indicado, esse tipo de coisa.
+
+[13:02] Então essas configurações vão ser feitas utilizando um container de injeção de dependência ou utilizando o framework que você estiver utilizando, mas o conceito não muda. E aí o nosso $useCase só vai precisar receber esse publicador já configurado, e vai publicar o evento.
+
+[13:19] Mais uma vez, como tudo que nós fizemos até aqui, existem outras estratégias para você trabalhar com eventos, para você publicar eventos, existem diversas estratégias. Cada estratégia tem seus prós e contras, e essa é uma das estratégias possíveis.
+
+[13:35] Como tudo o que eu vou falar nesse treinamento, vale muito a pena uma leitura mais aprofundada do que são eventos de domínio, como persistir, como tratar eles. Mas aqui, nós já vimos de forma bem prática como reagir e como publicar eventos.
+
+@@06
+Para saber mais: Ferramentas
+
+Se você possui familiaridade com algum framework web moderno (como Symfony, Laravel, etc) sabe que eles trabalham com eventos.
+Os eventos que os frameworks emitem por padrão não são eventos de domínio, porém nada nos impede de utilizar suas ferramentas a nosso favor para emitir nossos eventos de domínio.
+
+@@07
+Faça como eu fiz
+
+Chegou a hora de você seguir todos os passos realizados por mim durante esta aula. Caso já tenha feito, excelente. Se ainda não, é importante que você execute o que foi visto nos vídeos para poder continuar com a próxima aula.
+
+Continue com os seus estudos, e se houver dúvidas, não hesite em recorrer ao nosso fórum!
+
+@@08
+O que aprendemos?
+
+O que aprendemos nessa aula:
+Definimos o que é um evento;
+Entendemos o que é um evento de domínio;
+Aprendemos a implementar, emitir e reagir a um evento de domínio;
