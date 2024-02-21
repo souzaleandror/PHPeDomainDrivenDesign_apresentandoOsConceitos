@@ -520,3 +520,145 @@ O que aprendemos nessa aula:
 Definimos o que é um evento;
 Entendemos o que é um evento de domínio;
 Aprendemos a implementar, emitir e reagir a um evento de domínio;
+
+#### 21/02/2024
+
+@04-Contextos delimitados
+
+@@01
+Projeto da aula anterior
+
+Caso queira, você pode baixar aqui o projeto do curso no ponto em que paramos na aula anterior.
+
+https://caelum-online-public.s3.amazonaws.com/1822-DDD-PHP/02/DDD-PHP-projeto-aula-3-completo.zip
+
+@@02
+Implementando a gamificação
+
+[00:00] Boas-vindas de volta a mais um capítulo desse treinamento de introdução aos conceitos de DDD utilizando PHP. E agora nós vamos entrar em um capítulo que é bastante difícil, então vou tentar simplificar ao máximo.
+[00:13] Antes de falar de qualquer conceito, vamos falar o que eu quero implementar. Eu tenho indicações de alunos, eu tenho alunos se matriculando, então eu quero adicionar, para incentivar, para melhorar o meu negócio, eu quero implementar um conceito de gamificação, parecido com o que nós temos aqui na Alura.
+
+[00:30] Sempre que você responde dúvidas no fórum, você ganha alguns pontos. Quando você finaliza um curso, você ganha pontos. Então quero implementar alguma coisa desse tipo. Eu quero que, por exemplo, quando um aluno se matricular, ele receba um selo. Esse selo vai ter um nome, vai ter uma imagem, esse tipo de coisa.
+
+[00:48] Então vou implementar aqui, vou criar um novo módulo chamado "selo" ou "gamificação", por enquanto eu vou chamar de "selo". “Domínio > New > Directory > Name: Selo”. E vamos implementar essa classe “Selo > New > PHP Class > Name: Selo”, a entidade Selo. Ela vai ter o CPF do aluno, private Cpf $cpfAluno que vai receber esse selo, esse selo, o nome desse selo, pode ser um nome qualquer, e nós podemos ter uma imagem alguma coisa do tipo, mas por enquanto só o CPF do aluno e o nome.
+
+[01:24] Então por exemplo, o aluno pode ter o selo novo aluno, um selo iniciante, um selo novato, alguma coisa do tipo. Quando ele responder mais de 10 perguntas no fórum ele pode receber o selo, não sei, altruísta, pessoa que quer ajudar, algo do tipo. Quando ele indicar um aluno ele pode receber o selo de mão amiga, alguma coisa desse tipo, para incentivar que os alunos vão interagindo com a plataforma.
+
+[01:52] Então vamos criar o nosso construtor, deixa eu utilizar aquela ferramenta do “phpStorm”, que é a out insert, construtor recebendo os dois. Então recebi o CPF, recebi o nome, posso retornar os dois, cpfAluno aluno que retorna um CPF, e retornar o nome do selo. public function __toString() : string que vai retornar o nome do selo.
+
+[02:22] Então nós já temos o selo sendo representado como string, fica aí o desafio para você implementar aqueles testes, que nós já estamos acostumados, esse tipo de coisa.
+
+[02:31] Então nós temos agora um novo contexto da nossa aplicação, inclusive isso poderia até ser uma nova aplicação, uma aplicação diferente, porque tudo que eu preciso saber do aluno para gerar um selo para ele, é do CPF. Então poderia receber esse CPF, e a partir disso ter nossas regras. Nós conseguiríamos armazenar as regras de negócio aqui, dessa aplicação de forma separada, ou pelo menos, mesmo que seja na mesma aplicação, começar a separar esses contextos.
+
+[03:02] Porque, o que acontece? A parte de gamificação não precisa saber que um aluno tem que ter dois telefones ou não, não precisa conhecer todos esses detalhes do mesmo contexto, porque está tudo no domínio da mesma aplicação. Ela não precisa saber telefone de aluno, saber que existe a possibilidade de um aluno não ser encontrado, ele não precisa de todos esses detalhes.
+
+[03:27] Então o que nós podemos fazer, nós podemos começar a separar esses dois contextos. O contexto acadêmico, onde nós temos aluno, a indicação dos alunos, esse tipo de coisa. E o contexto de gamificação, onde nós vamos ter selos, o repositório de cada um dos selos, esse tipo de coisa. Então vamos começar a separar de uma forma diferente esses contextos, e colocar algumas barreiras, delimitar esses dois contextos. Vamos começar a implementar isso no próximo vídeo.
+
+@@03
+Separando os contextos
+
+[00:00] Eu implementei aqui, tem uma interface que adiciona um selo e busca os selos de aluno com o CPF informado. E implementei um repositório de selo em memória, só para nós termos o repositório implementado, que foi o desafio que eu deixei para vocês. Vamos começar a separar esses contextos.
+[00:23] Porque, de novo, eu não preciso que o meu contexto de gamificação, não preciso que o meu módulo de gamificação, saiba tudo sobre como funciona a indicação entre um aluno e o outro, ele não precisa ter as informações de cifra de senha do aluno, de LogDeAlunoMatriculado, sobre os telefones, ele não precisa ter acesso a isso tudo.
+
+[00:43] Então nós conseguimos separar, para evoluir esses dois contextos de forma separada. Então nós podemos ter esse contexto acadêmico, que tem aluno, que tem indicação do aluno etc., você pode até pensar em um nome melhor para isso. E nós podemos ter o contexto de gamificação, ou jogatina caso você prefira.
+
+[01:05] Vamos separar esses dois contextos por pastas. Então eu vou ter o contexto acadêmico, lá na raiz do “src”, e o contexto de gamificação. Então eu vou passar tudo que eu tenho por enquanto, para o meu contexto acadêmico e nós vamos ter que alterar todos aqueles namespaces, isso vai dar bastante trabalho.
+
+[01:26] E eu vou ter aqueles nossos “app”, ou application , nós estamos usando application. “App > Refactor > Rename > Aplicacao ” . Nós estamos usando o domínio, “Gamificacao > New > Directory > Dominio”, e um novo diretório chamado infra. Temos aqueles conceitos aqui.
+
+[01:58] E vamos pegar o domínio do selo, que nós já temos, e trazer para o domínio da nossa gamificação. Então eu posso até apagar os selos. Vou trazer também infraestrutura do selo, eu posso tirar de “infra” e adicionar em “gamificacao > infra”.
+
+[02:20] Então nós temos a infraestrutura do selo, que é o repositório e tem o domínio do selo, que é o selo em si e o repositório. Eu vou deixar para alterar todos namespaces depois. Então vamos lá, deixa eu fechar aqui. Então primeiro aqui em selo, eu não estarei mais em domínio direto. Eu vou estar em Gamificacao\Domínio\Selo.
+
+[02:50] Mesma coisa em RepositorioDeSelo.php, então, Gamificacao\Dominio\Selo. E no nosso RepositorioDoSeloEmMemoria, vai estar em “Arquitetura\Gamificacao\Infra\Selo”. E agora nós começamos a ter alguns problemas, deixou tirar isso auqi para importar de novo, só para importar no lugar certo. E agora nós temos um problema.
+
+[03:17] Nós temos dois contextos muito bem separados, temos o contexto acadêmico e o contexto de gamificação, onde cada um pode ser uma aplicação totalmente diferente, que tem aplicação, domínio, infraestrutura, podem evoluir de forma independente.
+
+[03:33] Só que aqui, nós temos bem claramente uma dependência, onde nosso contexto de gamificação está dependendo de algo do nosso contexto acadêmico, inclusive reparar que nosso namespace está errado, eu já vou corrigir. Mas então nós temos uma dependência muito clara e isso é um problema. Por quê? Vamos com bastante calma nessa parte.
+
+[03:57] Nós temos dois contextos que deveriam estar delimitados. Por que eles deveriam estar delimitados? Por que nós deveríamos ter certas barreiras? Porque nesse momento eu estou implementando esses contextos delimitados dentro de um mesmo projeto, só com pastas de separados e namespaces separados.
+
+[04:16] Só que isso pode, no futuro, e normalmente até acontece, evoluir para ser uma aplicação totalmente diferente. Como, por exemplo, pegar esse projeto de Gamificacao e separar em um componente diferente, de forma que eu possa fazer com composer, um ComposerRequireGamificacao, igual nós já aprendemos no curso de composer. Ou seja, separar em um projeto diferente.
+
+[04:40] Então se eu tenho essa dependência, eu tenho um problema muito grande. Eu não consigo isolar o meu contexto de gamificação, eu não consigo fazer com que ele seja um projeto independente. Então nós vamos começar a estudar como isolar, na prática, cada um dos contextos e como fazer com que cada um dos contextos possa comunicar entre si, sem violar esse tipo de regra.
+
+[05:04] Só que antes disso, vamos entender uma ferramenta, um dos padrões estratégicos do DDD, que é o mapa de contextos. Para nós conseguirmos visualizar, para nós conseguirmos enxergar o que faz parte de cada um dos contextos, e como eles vão se comunicar.
+
+[05:18] Só que isso nós vamos fazer no próximo vídeo. E entre um vídeo e outro, eu vou corrigir todos esses namespaces. Então deixa como desafio também, que é um desafio meio chato, mas nós vamos fazer, de corrigir todos os todos os namespaces do contexto acadêmico. Então te vejo no próximo vídeo.
+
+@@04
+Motivação
+
+Entendemos como separar contextos em nossa aplicação para isolá-los, mas...
+Qual a vantagem de separar nossa aplicação em contextos delimitados (Bounded Contexts)?
+
+Segurança
+ 
+Alternativa correta
+Performance
+ 
+Alternativa correta
+Flexibilidade
+ 
+Alternativa correta! Com contextos bem delimitados, podemos ter equipes separadas para trabalhar em cada um dos contextos e além disso eles podem até virar projetos separados, evoluindo individualmente.
+
+@@05
+Mapas de contexto
+
+[00:00] Vamos conversar um pouco sobre mapa de contexto, ou context map.
+[00:08] O mapa de contexto é uma ferramenta, um padrão estratégico do DDD onde nós definimos de forma visual como que os contextos se separam, e como eles se comunicam entre si.
+
+[00:18] Então eu peguei um exemplo da Internet qualquer, e isso deixa bem claro que a linguagem ubíqua deve ser utilizada, inclusive para mapear os contextos, ou seja, os profissionais de domínio, os experts de domínio, de negócios, os profissionais de negócio, devem saber que existe um contexto acadêmico, um contexto de Gamificação e eles sabem conversar sobre esse assunto, e sabem como cada um desses contextos se conversam.
+
+[00:47] Então nesse exemplo dado na figura, existe um contexto genérico, um subdomínio genérico, que não está na aplicação, no núcleo desse programa, que é sobre CRM. E esse CRM se comunica de alguma forma com o contexto de pedidos. O contexto de pedidos tem uma camada compartilhada com contexto de produtos.
+
+[01:10] O contexto de entrega precisa inclusive de uma camada que nós vamos conversar lá para frente, para se comunicar com o de pedidos também, de entrega se comunica com o de pedidos. Então existe esse desenho, que pode ser feito de forma bem menos interessante do que essa aqui, de forma bem menos profissional, vamos chamar assim.
+
+[01:30] Então vamos criar um mapa de contexto bem simples. Nós temos o contexto da nossa aplicação, o contexto como um todo, então deixa eu criar um quadrado para isso tudo, e nossa aplicação tem dois contextos. Nós temos o contexto acadêmico, deixa eu colocar um texto nesse círculo. E ele vai se comunicar com o contexto de Gamificação.
+
+[02:24] Nós temos esses dois contextos, e dentro de cada um dos contextos nós temos os conceitos, como, por exemplo, aluno. Um aluno tem um CPF, e nós temos também, em contexto de gamificação, os selos, e o selo precisa saber qual o CPF do aluno. Então nós vamos precisar de alguma forma ter uma interseção entre esses dois contextos, e nessa interseção nós vamos ter o CPF.
+
+[02:57] Olha só aqui no meio desses dois contextos, ou seja, teria que ter esse círculo da esquerda vindo para frente, mas eu não sei fazer isso nessa ferramenta. Nós vamos ter interação, porque o aluno tem CPF, e um selo também vai ter um CPF para identificar de qual aluno é esse selo. Então nós vamos conseguir nos comunicar entre esses dois contextos de uma forma, ou seja, tendo um código compartilhado.
+
+[03:19] Existe também a possibilidade, e é muito comum quando nós trabalhamos com contextos delimitados, essa comunicação não existir entre esses dois contextos, e nós termos uma duplicação, ou seja, nós temos o CPF no contexto acadêmico e nós temos uma outra representação aqui no contexto de gamificação.
+
+[03:42] Isso acontece bastante e essa duplicação permite que nós tenhamos dois contextos realmente separados, em projetos separados, sem nenhum conhecimento entre um e outro. Então são duas abordagens possíveis. De novo, como tudo que nós temos feito até aqui, com vantagens e desvantagens.
+
+[04:02] Essa abordagem do CPF duplicado, desse código duplicado, ela tem vantagem de que nossos dois contextos podem ser separados, podem ser feitos de forma independente, sem nenhuma preocupação. Eu tenho o CPF do aluno aqui e tem um CPF lá também, que eu consigo ter classes separadas sem nenhuma comunicação entre esses dois contextos.
+
+[04:37] Então eu consigo pegar todo esse contexto de gamificação e trazer para fora do sistema, e colocá-lo em um sistema diferente que fornece os dados através de uma API, por exemplo.
+
+[04:53] Agora aquele outro modelo que nós fizemos, nós temos uma vantagem óbvia de não ter a duplicação de código. Nós definimos uma parte compartilhada e onde essa parte é compartilhada, todos os contextos podem acessar.
+
+[05:08] E essa parte compartilhada é a abordagem que nós vamos utilizar, por enquanto, nesse treinamento. Então no próximo capítulo, vamos conversar bastante sobre comunicação entre contextos e como nós fazemos essa parte compartilhada entre contextos.
+
+[05:27] Mas o importante, por enquanto, é entender que nós separamos contextos da nossa aplicação para que eles evoluam de forma independente, para que cada um dos contextos possam, no futuro, virar uma aplicação independente, um serviço próprio, para que um não dependa do outro. Para que eu consiga ter equipes específicas no meu contexto de gamificação e no contexto acadêmico, para que eu consiga separar melhores responsabilidades. E assim, um sistema gigante consiga ser quebrado em menores partes.
+
+[06:02] Faz sentido eu criar bounded contexts, que é o nome desse padrão, eu criar contextos delimitados em um CRUD? Em um cadastro de aluno? Não faz sentido. Não tem necessidade, eu adiciono uma complexidade desnecessária.
+
+[06:15] Agora, em um sistema gigante, em um sistema realmente robusto, se eu defino contextos separados, eu consigo ter equipes específicas para cada um dos contextos, consigo evoluir esses contextos de forma independente, e facilito muito a evolução do sistema.
+
+[06:32] Então essa é a motivação para nós termos bounded contexts ou contextos delimitados, que é um conceito muito importante, muito estudado no DDD. Então no próximo capítulo, como eu já falei, estudaremos um pouco sobre a comunicação entre contextos.
+
+@@06
+Para saber mais: Bounded Contexts
+
+Bounded Contexts, ou contextos delimitados, são um dos conceitos mais complexos de entender e implementar do estudo do DDD.
+Vale a pena leituras mais aprofundadas para conhecer técnicas que envolvem este princípio.
+
+Aqui deixo um breve artigo com uma introdução ao termo: https://martinfowler.com/bliki/BoundedContext.html.
+
+@@07
+Faça como eu fiz
+
+Chegou a hora de você seguir todos os passos realizados por mim durante esta aula. Caso já tenha feito, excelente. Se ainda não, é importante que você execute o que foi visto nos vídeos para poder continuar com a próxima a
+
+Continue com os seus estudos, e se houver dúvidas, não hesite em recorrer ao nosso fórum!
+
+@@08
+O que aprendemos?
+
+O que aprendemos nessa aula:
+Conhecemos o conceito de Bounded Contexts ou Contextos Delimitados;
+Vimos que a separação em contextos nos dá mais flexibilidade porém aumenta (e muito) a complexidade;
+Conhecemos o desenho conhecido como Mapa de Contexto;
