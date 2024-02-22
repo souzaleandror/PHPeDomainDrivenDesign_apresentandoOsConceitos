@@ -662,3 +662,164 @@ O que aprendemos nessa aula:
 Conhecemos o conceito de Bounded Contexts ou Contextos Delimitados;
 Vimos que a separação em contextos nos dá mais flexibilidade porém aumenta (e muito) a complexidade;
 Conhecemos o desenho conhecido como Mapa de Contexto;
+
+#### 22/02/2024
+
+@05-Camada anticorrupção
+
+@@01
+Projeto da aula anterior
+
+Caso queira, você pode baixar aqui o projeto do curso no ponto em que paramos na aula anterior.
+
+https://caelum-online-public.s3.amazonaws.com/1822-DDD-PHP/02/DDD-PHP-projeto-aula-5-completo.zip
+
+@@02
+Sistemas distribuídos
+
+[00:00] Boas-vindas de volta a esse que é o último capítulo desse nosso treinamento de introdução a alguns conceitos de Domain Driven Design, ou DDD, utilizando PHP. Nesse capítulo eu quero bater um papo com vocês, embora vocês não estejam vendo meu rosto espero que vocês prestem bastante atenção. E vamos conversar um pouco sobre como isso aqui, como essa estrutura de contextos delimitados separados pode acabar evoluindo.
+[00:26] Nós temos no nosso caso, um sistema que possui todas as regras do nosso contexto acadêmico, do nosso contexto de gamificação e nós, junto aqui do mesmo projeto, temos uma outra estrutura que fornece acesso a isso. Seja através de comandos, nós poderíamos estar utilizando um framework web aqui. E aí teria uma pasta web e uma pasta app, que forneceria acesso um ponto de entrada a todos os nossos use cases.
+
+[00:55] Isso eu acredito que isso esteja claro até aqui, caso não tenha ficado claro até essa parte, vamos lá, nós vamos para o fórum respondemos todas as dúvidas, e depois voltamos aqui para esse ponto.
+
+[01:05] Tendo isso tudo em mente, como que isso pode acabar evoluindo? Primeiro, para um projeto chegar nesse nível de complexidade, de dificuldade, porque olha só a nossa estrutura como está, olha quanta coisa nós temos, quantas classes, quantos detalhes nós temos na nossa aplicação. Eu estou abrindo e não para de chegar. E nossa aplicação ainda não tem basicamente nada, ela está muito simples, mas mesmo muito simples nós já temos esse número enorme de arquivos, fora os testes.
+
+[01:36] Então você repara que a complexidade aumenta muito quando nós seguimos por esse caminho. E para valer a pena a complexidade aumentar nesse ponto, nós precisamos ter um sistema realmente complexo, onde essa separação justifique, e ao invés de complexidade ela simplifique. Fazendo com que nós possamos dividir equipes em contextos diferentes. Eu tenho uma equipe específica para gamificação, eu tenho uma equipe específica para o contexto acadêmico.
+
+[02:07] Então dessa forma nós só vamos implementar esse tipo de arquitetura, esse tipo de técnica de separação quando nosso projeto realmente pedir, quando for necessário. Nós não vamos fazer um crud separando contextos assim, não faz sentido e não vale a pena.
+
+[02:23] Então levando em conta que para um sistema chegar nesse nível de complexidade existe ainda uma espécie de evolução que seriam sistemas distribuídos. Eu não vou implementar nada de sistemas distribuídos, porque fugiria completamente do foco desse treinamento.
+
+[02:41] Mas basicamente um sistema distribuído, muito basicamente, seria a parte acadêmica está no sistema, em um servidor rodando, por exemplo, um projeto em “Symphony”. E a parte de gamificação está rodando em outro servidor, um outro domínio, rodando um projeto em “Falcon” ou “Lumen”, alguma coisa assim.
+
+[03:04] Então nós teríamos projetos diferentes, com programas diferentes, com tecnologias diferentes, em servidores diferentes, então nós distribuiríamos a nossa aplicação em vários locais, vários servidores.
+
+[03:17] E se nós criamos, se nós começamos o nosso projeto separando ele dessa forma, fica muito mais fácil distribuí-lo depois. Porque para eu separar esses projetos em dois, é fácil. Para cada um desses contextos eu crio um projeto separado e disponibilizo eles, para que eles sejam “instalados”, entre aspas utilizando composer, e com isso fica bem mais tranquilo de importar para um lugar ou para outro.
+
+[03:45] Então essa forma de estruturar facilita muito para que nós distribuamos nosso sistema, e um sistema distribuído tem, obviamente, como tudo que nós fizemos até aqui, vantagens e desvantagens. Em um sistema distribuído, nós sabemos que normalmente o nosso sistema acadêmico vai ter mais requisições, vai precisar de mais recursos do que o nosso sistema de gamificação.
+
+[04:10] Por dois motivos, é muito mais fácil um aluno estar se matriculando, ou assistindo cursos, esse tipo de coisa, do que está ganhando selos, acontece com muito mais frequência. E além disso é muito mais importante que nossos alunos consigam acessar seus cursos, seus treinamentos do que eles vejam seus selos. Então caso o sistema de gamificação saia do ar, nenhum aluno vai correr para cancelar matrícula. Agora se o sistema acadêmico sai do ar um problema é muito maior.
+
+[04:40] Então nós podemos direcionar mais recursos para esse contexto, para esse sistema acadêmico, enquanto esse sistema de gamificação, embora seja importante, não faça parte, não seja tão crucial para o funcionamento da aplicação.
+
+[04:50] Então imagina que em uma black friday, nós temos muitas matrículas, nós podemos reduzir custos, tirando um pouco dos recursos desse contexto, desse sistema de gamificação, e alocando para esse sistema acadêmico. Então nós ganhamos nesse ponto, só que para gerenciar isso é muito complexo.
+
+[05:08] Você provavelmente já ouviu o termo "microsserviços", microsserviços é uma arquitetura, uma forma de organizar sistemas distribuídos onde cada um dos sistemas tem propósitos bem específicos e são contextos pequenos e bem delimitados. É uma forma de manter seu sistema distribuído muito escalável só que a complexidade aumenta absurdamente, você tem muito mais problemas do que teria no sistema chamado de monolítico como nós temos feito até aqui.
+
+[05:38] Então tudo tem vantagens e desvantagens, e nós precisamos saber pesar, nós precisamos saber medir o que faz sentido para cada uma das aplicações. Sei que esse é um conceito bastante complexo, mas vale a pena a leitura também, é um assunto que eu tenho estudado hoje, é um assunto que eu não domino particularmente, por isso tenho estudado bastante.
+
+[05:59] E quando nós entramos nesse cenário de sistemas distribuídos, a comunicação entre dois contextos muda um pouco. Então no próximo vídeo, mais uma vez é um bate-papo, nós vamos conversar um pouco sobre a comunicação entre sistemas distribuídos.
+
+@@03
+Sobre os sistemas distribuídos
+
+Entendemos que contextos delimitados podem acabar evoluindo nosso sistema para se tornar um sistema distribuído.
+O que é um sistema distribuído, na prática?
+
+É um sistema que embora pareça ser um para o usuário, é constituído de vários outros sistemas menores
+ 
+Alternativa correta! Os famosos microsserviços são um tipo de sistemas distribuídos. Com sistemas distribuídos você ganha muitas vantagens porém também há desvantagens, como foi citado no vídeo
+Alternativa correta
+É um sistema que distribui a carga de todas as requisições
+ 
+Alternativa correta
+É um sistema que tem várias URLs para o usuário acessar
+
+@@04
+Camada anticorrupção
+
+[00:00] Voltando naquele nosso papo de sistemas distribuídos, imagina que nós temos dois sistemas diferentes, o nosso contexto acadêmico sendo servido como uma aplicação web, e o nosso contexto de gamificação sendo servido só como uma API Restful, não tem formulários, não tem muita interface.
+[00:21] Então o que acontece? Sempre que um aluno se matricular, preencheu um formulário e se matriculou, imagina que aqui no nosso lado esquerdo, nós temos um contexto acadêmico, e do lado direito nós temos um contexto de gamificação.
+
+[00:33] O nosso contexto acadêmico vai fazer o quê? Ele vai publicar aquele evento AlunoMatriculado em um sistema de mensagens, de fila de mensagens. Ele vai publicar aquilo e falar: “Um aluno foi matriculado." Caso alguém se interesse por isso, está aí na nossa lista de mensagens. E volta, devolve para o usuário a resposta falando que ele foi matriculado com sucesso, e vida continua.
+
+[00:57] E nessa fila de mensagens, vão ter várias mensagens, vários eventos, várias informações como um aluno matriculado, um aluno que cancelou a matrícula, uma indicação que aconteceu, talvez um novo selo foi gerado para algum aluno, várias mensagens acontecendo.
+
+[01:16] E aí os chamados receptores, os que estão lendo essas mensagens podem ver: “Tem aqui alguma mensagem dizendo que teve um aluno matriculado? Opa, essa mensagem que diz isso.” Então vou pegar essa mensagem, vou abrir e eu pego o CPF desse aluno e gero um novo selo, e salvo na minha base de dados. Ou seja, é inclusive possível através de sistemas distribuídos, que tenham bases de dados diferentes.
+
+[01:43] Aqui o nosso sistema acadêmico tem uma base de dados com os alunos, cursos, indicações. E nossa base de dados de gamificação tem pontos, selos, etc, e só relaciono utilizando o CPF. E esse relacionamento, esse CPF, é justamente o que pode ser chamado de camada de anticorrupção, não só o CPF, claro, mas uma camada, algumas classes que nós adicionamos que conhecem os dois lados.
+
+[02:10] Ou seja, eu teria aqui uma classe que conheceria, que entenderia o CPF de um aluno, para saber formatar ele caso fosse preciso fazer qualquer transformação para salvar esse CPF aqui no nosso contexto de gamificação. Então essa transformação, essa comunicação mais direta entre um contexto e outro, essa parte que conhece os dois contextos é chamada de camada de anticorrupção.
+
+[02:36] E quando nós temos distribuição de sistemas, quando nós temos sistemas distribuídos, essa camada de anticorrupção é muito necessária e existem várias formas de implementar, como simples classes de tradução, ou um sistema inteiro rodando aqui na frente. Então é um conceito, de novo, que vai além do escopo deste treinamento, mas que os livros de DDD citam então obviamente nós precisamos citar para que você conheça o termo.
+
+[03:02] Como muitas das coisas que eu comentei nesse curso, eu disse que vale a pena uma leitura mais aprofundada, no próximo vídeo eu volto com algumas referências de livros, artigos talvez, como eu já deixei em exercícios anteriores alguns artigos, para que você continue esse estudo na área de Domain Driven Design, na área de arquitetura. Para que você aprofunde seu conhecimento além do que esse treinamento já te deu.
+
+@@05
+Acaba aqui?
+
+[00:00] Esse vídeo não é propaganda nem nada, mas eu não posso deixar de citar as referências que eu vou citar aqui.
+[00:08] Existem alguns livros e alguns autores muito conhecidos no ramo de DDD, o principal livro e foi o livro que originou esse estudo é esse daqui “Domain-Driven Design: Tackling Complexity in the Heart of Software”, ou seja, design guiado ao domínio: atacando a complexidades no coração do software, ou seja, começando pelo domínio, pelo mais importante. Então esse livro foi o que originou todo esse estudo de DDD e foi criado pelo Eric Evans, foi ele quem escreveu esse livro.
+
+[00:42] E ele também lidera esse projeto “Domain Language”. Vale a pena acessar esse site, ver algum dos conteúdos que tem aqui, tem alguns artigos, é muito interessante. Vale a pena, é gratuito.
+
+[00:56] Só que esse livro do Eric Evans tem uma leitura, vamos dizer, cansativa. É uma leitura um pouco mais pesada. Então pensando nisso e para simplificar um pouco, o Vaughn Vernon escreveu um livro chamado “Implementing Domain-Driven Design”, ou seja, implementando o design guiado a domínio. Então é uma espécie de releitura do livro do Eric Evans com uma linguagem um pouco mais simples de ler, vamos dizer dessa forma.
+
+[01:31] Então esse livro que possui mais ou menos o mesmo conteúdo do livro do Eric Evans com uma linguagem um pouco mais fácil. Então aqui também tem todos os conceitos teóricos e uma parte prática do DDD. É bem interessante.
+
+[01:45] E o Vaughn Vernon tem esse site acessível neste link. Onde você consegue ver eventos em que ele participa, workshops que ele já deu, palestras, tem bastante conteúdo que também vale a pena.
+
+[01:56] E como nós estamos falando de DDD, eu não poderia deixar de citar o livro “DDD em PHP”. Esse livro “DDD in PHP”, ou “DDD em PHP”, é exatamente isso. É a implementação DDD utilizando PHP, é a implementação dos padrões táticos utilizando PHP.
+
+[02:21] E nesse livro, que eu recomendo demais a leitura, nós vemos bastante coisa do que eu já falei aqui, só que com muito mais detalhes. Como por exemplo, aquelas estratégias que eu citei sobre persistência, transação e consistência dos dados ao persistir aggregates, aqui tem um capítulo bem interessante sobre isso. Comunicação entre bounded contacts tem um capítulo específico sobre isso, um capítulo para só para domain events.
+
+[02:55] Tem muitos exemplos práticos e utilizando PHP, e a linguagem utilizada nesse livro, a forma que é falada é muito simples. É um livro que eu não sei se existe a tradução para português eu só li a versão em inglês, mas eu recomendo muito a leitura. Vale muito a pena.
+
+[03:11] E falando em idioma, em português ou inglês, existe um canal de um ex instrutor aqui da Alura inclusive, o Alberto Souza, e ele pública bastante conteúdo no canal do YouTube dele, Dev Eficiente acessível neste link, e eu recomendo demais. Um dos últimos vídeos é justamente sobre o que eu comentei da realidade do DDD, que nós nem sempre precisamos implementar isso tudo, separar contextos, fazer tudo isso que o DDD ensina nas nossas aplicações do dia a dia.
+
+[03:40] Existem outros vídeos específicos sobre DDD, como por exemplo service, esse vídeo onde ele fala sobre o pattern que foi definido no livro, mas que hoje em dia é mal utilizado, enfim. É um canal chamado “Dev Eficiente”, muito interessante que eu também recomendo a leitura.
+
+[03:58] Então com isso tudo, com essa enxurrada de referências, o que eu quero dizer é que esse treinamento foi realmente uma introdução, você só tá colocando o pé nesse oceano que é o estudo de DDD, de arquitetura, de design orientado a objetos.
+
+[04:15] Então nós, embora tenhamos falado sobre muita coisa, tenha sido um conteúdo já denso e meio avançado, tem muito mais coisa para estudar. Então eu tenho pouco hábito de leitura, mas eu tenho adquirido, justamente por causa desses estudos, estudos para nós conseguirmos ler na fonte, como ler o livro do Eric Evans, vale a pena. Ler esse livro específico em DDD vale muito a pena.
+
+[04:40] E o Alberto Souza é uma das pessoas que estão fazendo esse trabalho de entregar informação de forma um pouco mais simples para nós, então recomendo demais.
+
+[04:49] Existe muito conteúdo legal, vale a pena pesquisar. Durante o treinamento deixei alguns artigos sobre pontos específicos, pesquise mais sobre esses autores e no próximo vídeo é aquele tchau!
+
+@@06
+Para saber mais: Referências
+
+DDD é um assunto com muito conteúdo e seria impossível colocar tudo em cursos em vídeo. Há vários livros que são “leituras obrigatórias” para quem quer se aprofundar na área.
+O livro que originou o termo DDD: https://www.amazon.com.br/dp/B00794TAUG/ref=dp-kindle-redirect?_encoding=UTF8&btkr=1
+Uma releitura com uma linguagem um pouco mais palatável: https://www.amazon.com.br/Implementing-Domain-Driven-Design-English-Vaughn-ebook/dp/B00BCLEBN8/ref=reads_cwrtbar_2/136-2192446-3149439?_encoding=UTF8&pd_rd_i=B00BCLEBN8&pd_rd_r=1b2f1be2-3f0c-40e3-929b-21cd85850dfc&pd_rd_w=mbTue&pd_rd_wg=N9ZBi&pf_rd_p=fcd5cfce-70d2-4fb2-84e0-1100e88dded2&pf_rd_r=A5H4RARTFWM0QB02JWYS&psc=1&refRID=A5H4RARTFWM0QB02JWYS
+Um livro prático sobre implementação em PHP de conceitos do DDD: https://leanpub.com/ddd-in-php
+Há ainda diversos canais do YouTube, blogs e sites que falam sobre DDD. Vale a pena a pesquisa.
+
+@@07
+Faça como eu fiz
+
+Chegou a hora de você seguir todos os passos realizados por mim durante esta aula. Caso já tenha feito, excelente. Se ainda não, é importante que você execute o que foi visto nos vídeos para poder continuar com os próximos cursos que tenham este como pré-requisito.
+
+Continue com os seus estudos, e se houver dúvidas, não hesite em recorrer ao nosso fórum!
+
+@@08
+O que aprendemos?
+
+O que aprendemos nessa aula:
+Conversamos sobre o que é um sistema distribuído;
+Vimos que através de contextos delimitados podemos distribuir sistemas realmente complexos;
+No caso de sistemas distribuídos, falamos que há a necessidade de uma camada anti-corrupção;
+Vimos algumas referências para nos aprofundar no assunto de DDD.
+
+@@09
+Conclusão
+
+[00:00] Parabéns por ter chegado até o final desse treinamento. Sei que foi um treinamento meio denso, com alguns conceitos que eu não pude me aprofundar muito, mas é um conteúdo muito importante, eu realmente espero que você tenha entendido esse básico e tenha interesse em se aprofundar, procure mais conteúdo sobre.
+[00:18] Então, recapitulando o que nós vimos, começamos só com essa parte - "Aplicacao", "Dominio", "Infra" - do nosso projeto, onde nós vimos muitos conceitos de arquitetura no treinamento anterior, revimos e fomos implementando mais coisas.
+
+[00:30] Nós entendemos que um aggregate root é feito através de invariantes entre relacionamentos, nós entendemos que um aggregate root não é uma coleção, nós vimos essa diferença, implementamos a lógica e falamos sobre a persistência disso. Fica aí mais uma vez a dica de estudar sobre consistência na persistência de aggregate root.
+
+[00:55] E nós avançamos nossos estudos, nós falamos sobre eventos de domínio, nós entendemos como implementar eventos de domínios, como publicar, como ouvir esses eventos. E para isso nós criamos algumas classes próprias para tratar eventos. Existem pacotes que te ajudam no desenvolvimento dessa parte de domínios, mas o que nós fizemos aqui é bem próximo do que acontece na vida real.
+
+[01:20] Além de eventos de domínio, além de entidades aggregates value objects, nós começamos a falar de uma parte mais arquitetural e estratégica, onde nós separamos nosso projeto em contextos. Esses contextos precisam de uma barreira, por isso são chamados de contextos delimitados, bounded context.
+
+[01:38] Esses contextos delimitados, em via de regra não devem se conhecer, não devem falar um com o outro. E quando isso é necessário, existem estratégias. Se nós estamos falando de um sistema distribuído como nós conversamos bastante, nós podemos fornecer uma API, nós podemos fornecer dados através de uma API RESTful, por exemplo, ou mensageria como nós comentamos também, utilizando os eventos para se comunicar.
+
+[02:03] Mas como no nosso caso é um sistema separado em contextos mas um sistema monolítico, nós pudemos utilizar a técnica chamada de shared kernel, ou núcleo compartilhado. Que nada mais é do que um contexto onde todos os outros contextos podem acessar.
+
+[02:19] E com isso nós chegamos no ponto da conversa de comunicação entre bounded contexts, separação em sistemas distribuídos, nós conversamos bastante sobre isso e eu espero honestamente que você tenha ficado com dúvidas. Porque se você tiver entendido tudo de cara, só com as minhas explicações, quer dizer que esse conteúdo foi muito raso. Então espero que você tenha dúvidas.
+
+[02:42] Espero que você compartilhe suas dúvidas comigo no fórum, eu tento responder pessoalmente sempre que possível, mas quando eu não consigo a nossa comunidade de alunos e nossos moderadores são muito solícitos, então eles, com certeza, vão ajudar você.
+
+[02:58] Mais uma vez parabéns por ter chegado até aqui, espero que você tenha gostado. Muito obrigado por ter me acompanhado e me aturado até esse ponto, espero te ver em outros treinamentos aqui na Alura. Forte abraço e tchau!
