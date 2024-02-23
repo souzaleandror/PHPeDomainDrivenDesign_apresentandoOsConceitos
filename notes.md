@@ -663,9 +663,185 @@ Conhecemos o conceito de Bounded Contexts ou Contextos Delimitados;
 Vimos que a separação em contextos nos dá mais flexibilidade porém aumenta (e muito) a complexidade;
 Conhecemos o desenho conhecido como Mapa de Contexto;
 
+#### 23/02/2024
+
+@05-Contexto compartilhado
+
+@@01
+Projeto da aula anterior
+
+Caso queira, você pode baixar aqui o projeto do curso no ponto em que paramos na aula anterior.
+
+https://caelum-online-public.s3.amazonaws.com/1822-DDD-PHP/02/DDD-PHP-projeto-aula-4-completo.zip
+
+@@02
+Shared Kernel
+
+[00:00] Boas-vindas de volta a mais um capítulo desse treinamento de introdução aos conceitos de DDD utilizando PHP. E no último capítulo, nós começamos a falar, íamos separar contextos delimitados, ou bounded contexts. E eu comecei, nós fizemos a separação, e entre um vídeo outro, como prometido, eu corrigi os namespaces.
+[00:21] Agora eu tenho corretamente Alura\Arquitetura\Academico, e na camada de Aplicacao, módulo de Aluno, etc. Então já corrigi todos os namespaces só fiz um find and replace com a IDE, e também já corrigi a parte de testes, para que quando eu for propor para que você crie testes para o bounded contexts de gamificação, você crie uma pasta diferente também e separe tudo adequadamente.
+
+[00:52] Então com isso definido, está na hora de nós começarmos a conversar sobre a comunicação entre esses bounded contexts. Nós comentamos no nosso mapa de contexto sobre a possibilidade de ter uma parte que é compartilhada entre esses dois módulos. Então essa parte é o que nós vamos criar agora. Essa parte compartilhada que é shared kernel, ou seja, um núcleo compartilhado, uma parte, um contexto compartilhado.
+
+[01:37] Existem inúmeras formas de nós implementarmos isso, e a forma mais simples é junto com cada um dos bounded contexts, ou seja, aqui na raiz, eu vou criar uma pasta chamada "compartilhado", "compartilhamento" ou "shared" que é mais comum esse nome porque vem do padrão shared kernel.
+
+[01:58] Então o que nós vamos ter no nosso núcleo compartilhado? Nós sabemos que nós precisamos do CPF tanto para o contexto de gamificação, quanto para o contexto acadêmico, então eu vou copiar esse Cpf.php por enquanto e no nosso shared kernel, no nosso núcleo compartilhado, eu vou criar uma nova pasta “New > Directory > Name: Domínio”, que vai ser uma pasta de domínio, ou seja, uma parte de domínio que é compartilhado entre os dois e vou colar minha classe de Cpf.
+
+[02:30] E ao invés de estar no contexto Academico, vai estar no contexto shared. Agora nós temos o Cpf pronto para ser compartilhado, então eu posso vir aqui em Indicacao e remover esse Cpf.php, e isso vai quebrar várias coisas, como nós já sabemos.
+
+[02:50] Então mais uma vez, o que eu vou fazer, ao invés de ir em cada um dos lugares, por exemplo, vir aqui no Aluno.php e encontrar todos os lugares onde ele usa CPF, eu vou pesquisar por essa ocorrência e substituir pelo namespace do kernel. Então no PHPstorm é “Ctrl + Shift + R”, então eu vou buscar por esse termo aqui e vou substituir, ao invés de Academico vai utilizar o Shared.
+
+[03:16] Então vai na parte inferior, em substituir todos. Parece que não foi, “Ctrl + Shift + R” de novo, eu coloquei para procurar só no diretório, mas na verdade é no projeto todo. Agora sim deve ir, substituir todos, e agora parece que foi. Vamos ver inclusive aqui se nós temos algum teste para isso, em testes nós tem um CpfTest.php. Então vamos trazer esse teste para fora, no “Shared”.
+
+[03:47] Então nós vamos ter também um domínio, e o nosso “Cpftest.php” vai vir para esse Dominio. Vamos corrigir o teste com os namespaces corretos caso precise, vamos ver, em shared. A princípio é isso mesmo. Então vamos lá, vamos executar nossos testes e garantir que tudo continua passando, que nós não demos nenhuma bobeira. Todos os testes passando, então vamos continuar nosso desenvolvimento.
+
+[04:28] Agora que eu já corrigi os namespaces e as pastas, nós temos agora o que é chamado de núcleo compartilhado. Então mais uma vez, eu tenho o meu contexto acadêmico, tenho o meu contexto de gamificação, e tenho tudo que for compartilhado entre eles que no caso, por enquanto, é só o CPF.
+
+[04:45] Então se nós dermos uma olhada no nosso “Selo.php”, nós já estamos utilizando, opa, ainda não, nós vamos utilizar agora, o shared, ou seja, do contexto compartilhado, nós vamos utilizar o CPF.
+
+[04:48] Então com isso nós resolvemos um problema, mas claro que esse problema não foi totalmente solucionado porque, de novo, se eu quisesse separar o contexto de gamificação como uma aplicação totalmente isolada, nós vamos ter um problema, vamos ter que copiar esse código e trazer para a pasta Gamificacao, alguma coisa do tipo.
+
+[05:16] Mas por enquanto, como nós não temos intenção imediata de realizar essa migração de um bounded context para um projeto separado, isso já resolve o nosso problema. Então essa é uma solução simples, que traz um outro problema, mas resolve momentaneamente o primeiro problema de nós não podermos nos comunicar diretamente com um contexto.
+
+[05:39] Então agora que nós temos o nosso selo, vamos pensar em que momento poderíamos gerar aquele selo de novato, por exemplo. Então vamos conversar sobre isso no próximo vídeo.
+
+@@03
+Para saber mais: Shared Kernel
+
+A utilização de um núcleo compartilhado tem suas vantagens e desvantagens.
+É a forma mais fácil de possibilitar a comunicação entre contextos delimitados, mas nos tira boa parte da flexibilidade.
+
+Aqui nesse artigo há uma revisão sobre Bounded Contexts e uma breve citação sobre Shared Kernel: http://www.fabriciorissetto.com/blog/ddd-bounded-context/
+
+http://www.fabriciorissetto.com/blog/ddd-bounded-context/
+
+@@04
+Ouvintes independentes
+
+[00:00] E agora que nós já entendemos sobre a separação entre contextos delimitados, ou bounded contexts e também aprendemos sobre shared kernel, ou núcleo compartilhado, onde nós temos uma espécie de contexto que pode ser utilizado pelos outros contextos. Vamos implementar uma regra, vamos implementar o caso onde nós geramos um selo, um selo chamado "novato", por exemplo, para um aluno que acabou de ser matriculado.
+[00:30] Então se nós vamos gerar um selo quando um aluno foi matriculado, nós vamos acabar utilizando, o que nós queremos é utilizar esse evento aqui, AlunoMatriculado.php. Então vamos implementando e nós vamos nos deparar com vários problemas e, conforme formos nos deparando com esses problemas, eu vou comentando sobre eles.
+
+[00:50] Primeiro, se eu quero lá no meu contexto de gamificação poder ouvir eventos, eu preciso ter acesso a toda essa parte de eventos também. Então eu vou trazer isso tudo -Evento.php, OuvinteDeEvento.php, PublicadorDeEvento.php- lá para o meu contexto compartilhado. Então vou apertar “Ctrl + X” e vou mover para cá, “Dominio > New > Directory > Name: Evento” e eu vou colar aqui, nesse novo diretório.
+
+[01:12] E agora, eu preciso primeiro alterar esse namespace, porque agora não está mais no contexto Academico, está no contexto Shared, e não está direto na raiz do domínio, está em uma pasta Evento. Então vou copiar esse namespace Alura\Arquitetura\Shared\Dominio\Evento, e eu vou colar em OuvinteDeEvento.php e Evento.php.
+
+[01:37] Então com isso o que nós fizemos, nós quebramos os lugares onde utilizavam eventos. Então vamos corrigir só esse local AlunoMatriculado.php. Vamos lá, ele vai utilizar agora do contexto compartilhado. Então podemos até corrigir esse LogDeAlunoMatriculado.php bem rápido, que não vai demorar muito, importei.
+
+[02:03] Então o que eu fiz? Eu movi as classes referentes a Eventos, ou seja, a interface de Evento em si, esse OuvinteDeEvento e o PublicadorDeEvento, eu movi todos eles para o nosso contexto compartilhado, para o nosso núcleo compartilhado e botei dentro de uma pasta “Evento”.
+
+[02:21] Com isso configurado, eu já posso criar aqui no meu contexto de gamificação algo que reaja ao evento de AlunoMatriculado, então vamos lá, deixa eu fechar todas as abas, e abrir em Gamificação, isso vai ser um caso de uso, mesmo que não venha da aplicação vai ser um caso de uso. Então em Aplicacao eu poderia até colocar que é um caso de uso, que houve um evento, então poderia botar em uma pasta chamada evento, mas eu não vou me preocupar com isso.
+
+[02:49] Vamos lá, “Aplicacao > New > PHP Class > Name: GeraSeloDeNovato”, que é o que essa classe vai fazer, ela vai gerar um selo chamado novato. Então vou estender um ouvinte, ou seja, isso vai ser um OuvinteDeEvento, então preciso implementar esses dois métodos, PHPstorm já me dá uma mão. E na linha 12 entra o primeiro problema.
+
+[03:12] A implementação desse método “sabeProcessar” foi feita assim return $evento instanceof AlunoMatriculado, se o evento for da instância de AlunoMatriculado, então ele sabe processar. Mas assim nós teríamos o problema de estar acessando diretamente o outro contexto, o contexto acadêmico e isso fere aquela nossa barreira entre os contextos.
+
+[03:33] Então nós temos duas soluções, eu vou implementar a solução mais fácil e vou deixar como desafio para que vocês implementem a solução, entre aspas, mais bonita. A solução fácil é pegar essa string, que é o nome completo da classe, e garantir que o nome da classe desse evento é igual àquela string grande, ou seja, o nome completo.
+
+[04:00] Então o que eu estou fazendo, na prática, é a mesma coisa, só que eu não estou acessando diretamente o outro contexto, eu não estou utilizando a classe em si outro contexto. Então caso isso aqui vá para projeto, essa string continua a mesma, e eu não vou ter esse problema.
+
+[04:16] Só que eu, obviamente, tenho outro problema. Se o namespace mudar, se o nome da classe mudar, eu vou quebrar esse código. Então isso é um problema, por isso eu vou te deixar a sugestão de implementar a solução mais interessante, que é aqui no “Evento.php”, colocar o nome dele. Por exemplo, todo evento tem que informar seu nome.
+
+[04:40] Então fazendo dessa forma, o nome do evento nós poderíamos buscar de $evento->nome() nós verificaríamos se é igual aluno_matriculado, por exemplo, ou algo do tipo. Vou deixar essa sugestão para que você implemente, mas eu vou seguir essa abordagem da linha 12.
+
+[04:57] Então um problema resolvido, agora chega o outro problema. Nós não podemos acessar de evento, o método CpfAluno, CpfAluno não é um método disponível na interface evento. E para nós gerarmos aquele selo, o selo de Novato, nós precisamos de um Cpf do aluno. Então de novo, nós temos várias soluções possíveis.
+
+[05:19] Uma das soluções é, mesmo o PHP não me garantindo que o que vai vir para esse método é uma instância do evento AlunoMatriculado, eu posso ainda chamar o método diretamente, sem problema, o PHP permite que eu faça isso. O que eu estou fazendo é assumindo o controle e dizendo: “Olha só PHP, mesmo sabendo que esse método pode não existir, eu vou chamar ele.”
+
+[05:42] Então o PHP deixa e o PHPstorm até percebeu que esse método é do evento AlunoMatriculado. Mas uma solução um pouco mais, vamos dizer, flexível, seria aqui no meu evento eu ter algum método chamado, por exemplo, toArray ou algo do tipo. Para Json para array, ou seja, representar um evento em um formato genérico, que não precisa ser de uma classe específica.
+
+[06:15] E na linha 17, eu pegaria, por exemplo, esse toArray e acessaria o cpfAluno. Isso é uma possibilidade. Então vamos fazer isso, só que eu vou fazer isso de uma forma ainda mais interessante. Eu vou fazer com que todo o evento seja serializado como Json. Se é um evento, ele precisa saber se serializar como Json, ele precisa saber ser representado como Json.
+
+[06:38] Então deixa importar isso. Então o que nós vamos fazer com isso, toda a classe que implementar a interface Evento, também implementa a interface JsonSerializable, e essa interface já está dizendo para o meu AlunoMatriculado que falta algo, porque essa interface tem o método JsonSerialize, que devolve uma array ou qualquer dado serializável em Json, mas array é uma possibilidade.
+
+[07:09] Então o que eu vou fazer? Eu vou retornar get_object_vars, ou seja, vou retornar todas as propriedades em um formato de array associativo. Onde a chave cpfAluno vai ter o valor do $cpfAluno, e a chave momento vai ter o momento, vai ter a data e o horário do momento desse evento.
+
+[07:30] Então de forma simples nós resolvemos esse problema, então na linha 17 eu posso chamar o método de JsonSerialize que vai me dar um array e desse array eu posso pegar o $cpf do cpfAluno. É uma solução flexível que mais uma vez, como tudo que nós fizemos aqui, tem suas vantagens e desvantagens.
+
+[07:50] A vantagem é que eu consigo facilmente desacoplar o meu contexto de gamificação em um projeto separado, e esse código das linhas 17 e 18 não vai precisar de modificação nenhuma. Eu continuo pegando o evento como serializado, como um array associativo e continuo pegando o CPF, sem problema.
+
+[08:07] Só que esse CPF, obviamente, teria que vir como uma string, etc. Não vou me preocupar com essas coisas por enquanto. Então agora eu vou gerar o novo selo, esse selo vai receber o CPF do aluno e um nome, que vai ser novato.
+
+[08:25] “Vinícius, mas não seria melhor ter uma classe chamada selo novato, ou então na linha 12 você ter Selo: :Novato, algo assim para não escrever o nome errado?” Seria! Seria o ideal. Nós podemos pensar em modelar isso, mas por enquanto, isso aqui já atinge o meu objetivo, eu não preciso melhorar o design dessa parte.
+
+[08:45] E para salvar esse selo, preciso de um repositório. Então vou receber no construtor, um RepositorioDeSelo, initialize.E nesse RepositorioDeSelo o que eu vou fazer, simplesmente adiciono esse $selo, sem segredo, sem complicação.
+
+[09:10] Agora sempre que o evento AlunoMatriculado for emitido através desse PublicadorDeEvento, nós podemos reagir inserindo e gerando esse novo selo. Só que como nós já vimos, existem vários problemas. Qual é esse problema? Nós precisamos configurar esse PublicadorDeEvento para adicionar esse ouvinte aqui em GeraSeloDeNovato.
+
+[09:33] No nosso caso é muito fácil, nós estamos no mesmo projeto, então em um único projeto nós adicionamos lá naquele nosso naquele container de injeção de dependência, ou no nosso caso, aqui no nosso MatricularAluno, deixa eu apagar isso porque todos os namespaces mudaram, e importar.
+
+[10:00] Então como tudo mudou, todos os namespaces mudaram, eu já trouxe os corretos. Eu poderia no meu $publicador adicionar esse ouvinte de GeraSeloDeNovato() e dentro dos parênteses eu posso aquele RepositorioDeSeloEmMemoria.
+
+[10:22] Com isso, o que eu estou fazendo, aquela minha camada de interface de usuário, ou então esse projeto totalmente que utiliza os meus contextos, ele vai saber configurar os eventos, é possível, como nós estamos vendo aqui, porque isso está fora de cada um dos domínios, isso é uma aplicação separada.
+
+[10:40] Então eu tenho PublicadorDeEventos, tenho ouvintes de contextos separados, ok, isso funciona. E no meu $useCase, quando o $useCase acontecer, ele vai publicar o evento e perfeito, tudo funciona o meu selo vai ser gerado. Vamos ver qual erro está acontecendo, acho que é um problema com namespace.
+
+[11:00] Então aqui nós já temos uma prova, uma amostra de como seria essa comunicação entre dois contextos delimitados. Mas, obviamente, nós temos alguns problemas.
+
+[11:12] Uma parte da nossa aplicação que vai ser, por exemplo, a interface com a web, essa parte da aplicação que é mais ampla vai ter que conhecer todos os contextos. Mas isso é comum. Isso é como se fosse um projeto diferente.
+
+[11:27] Normalmente você tem, como nós falamos na parte de arquitetura, uma pasta chamada “app”, ou “web”, ou algo assim que utiliza todo o projeto que nós criamos aqui. Existiria a possibilidade também, como nós falamos no capítulo anterior, de eu criar um componente que vai ser importado, composer require academico e eu também importo composer require gamificacao, e nesse projeto em que eu importei os dois, realizaria essa configuração.
+
+[11:56] As possibilidades são infinitas, e aqui nós estamos abordando só algumas delas. Mas com isso nós já começamos a implementar a comunicação entre mais de um contexto delimitado.
+
+@@05
+Nome dos eventos
+
+Neste vídeo nós começamos a esbarrar em problemas do uso de Bounded Contexts e utilizamos eventos para realizar a comunicação entre eles.
+Por que não utilizar diretamente a classe de um evento para saber seu nome? Qual a vantagem de usar a string hard coded?
+
+Performance
+ 
+Alternativa correta
+Flexibilidade
+ 
+Alternativa correta! Sem depender diretamente da classe, continuamos com um baixo acoplamento entre os contextos delimitados, nos permitindo estendê-los de forma independente.
+Alternativa correta
+Segurança
+
+@@06
+Fornecendo dados
+
+[00:00] E só para nós consolidarmos conhecimento, vamos fazer uma recapitulação rápida. Nós podemos, e normalmente é comum quando nós trabalhamos com contextos delimitados, quando nós chegamos nesse nível de complexidade da aplicação, é comum que nós tenhamos os contextos como uma aplicação, e o que vai ser servido para o usuário, por exemplo, comandos da linha de comando, o projeto web, a API, isso é um projeto separado. É comum fazer dessa forma.
+[00:34] Então nós começamos a entender sobre isso, nós vimos sobre a separação de contextos, vimos sobre o núcleo compartilhado, quando faz sentido utilizar, enfim. Nós já temos entendido bastante coisa. Então para consolidar o que nós vimos, inclusive no treinamento de arquitetura, vamos criar um novo use case, um caso onde nós podemos fornecer os selos de determinado usuário.
+
+[00:58] Vamos lá, “Aplicacao > New > Directory > Name: BuscarSelosDeUsuario”, e aqui nós vamos ter, “BuscarSelosDeUsuario > New > PHP Class > Name: BuscarSelosUsuarioDto”, e uma classe que vai realmente executar isso, “BuscarSelosDeUsuario > New > PHP Class > Name: BuscarSelosUsuario”.
+
+[01:28] Então o nosso “Dto”, o que nós precisamos, só do CPF do aluno. Então vamos lá, um construtor onde nós vamos receber, deixa eu criar a propriedade antes, public Cpf $cpfAluno, só que lembra que um “Dto” não utiliza tipos do nosso domínio, então vamos receber uma string. Então out insert, vou gerar o construtor inicializando o CPF.
+
+[01:57] Já temos o nosso “Dto”, agora para buscar os selos de usuário, eu preciso de um RepositorioDeSelo, vou inicializar. Nós podemos executar esse caso de uso recebendo o BuscarSelosUsuarioDto, ou seja, os $dados.
+
+[02:18] Então através desse nosso repositório, já poderíamos diretamente buscar os selos do aluno? Ainda não, nós precisamos criar um CPF a partir dos dados. Agora sim, nós podemos passar o CPF do aluno e pegar todos os selos. Então nós poderíamos retornar diretamente esses selos, formatados como Json,json_encode, nós poderíamos devolver eles no formato de xml, como nós preferirmos.
+
+[02:51] Mas como isso aqui é um caso de uso, não está se comunicando diretamente com o mundo exterior, eu vou retornar diretamente essa lista, esse array de selos. Deixa eu ver qual o problema que ocorreu na linha 27, ele está utilizando o CPF no namespace errado, corrigido.
+
+[03:11] Agora nós temos um caso de uso em outro contexto, ou seja, eu poderia, na minha API, nós fornecermos um novo end point, por exemplo, um end point que informe todos os selos de um usuário em Json, e nós poderíamos utilizar esse use case.
+
+[03:27] Então dessa forma nós entendemos que há pontos de entrada em diferentes contextos. Em um contexto eu estou buscando os selos, em outro contexto eu estou matriculando alunos, então nós conseguimos separar os casos de uso de cada um dos contextos e eles não precisam se conhecer para funcionar, e esse é o ponto principal.
+
+[03:49] Nós temos que poder, a qualquer momento, separar o nosso contexto acadêmico do nosso contexto gamificação em projetos separados sem modificar muita coisa. Óbvio que vão ser necessárias modificações, nós estamos utilizando um núcleo compartilhado, que dificultaria um pouco, mas nós conseguimos fazer essa separação sem muito problema, sem muito trabalho.
+
+[04:13] Então com esse novo caso de uso implementado, eu vou deixar, obviamente, como sempre tenho feito, um exercício para que você crie um teste para ele. Você simplesmente precisa garantir que em um repositório, que tenha algum selo para algum aluno, esse caso de uso retorna esse selo.
+
+[04:31] Então com esse desafio, no próximo capítulo nós voltamos para bater um papo, não vai colocar mais a mão na massa, mas nós vamos conversar bastante sobre como nós podemos evoluir uma aplicação separada dessa forma.
+
+@@07
+Faça como eu fiz
+
+Chegou a hora de você seguir todos os passos realizados por mim durante esta aula. Caso já tenha feito, excelente. Se ainda não, é importante que você execute o que foi visto nos vídeos para poder continuar com a próxima aula.
+
+Continue com os seus estudos, e se houver dúvidas, não hesite em recorrer ao nosso fórum!
+
+@@08
+O que aprendemos?
+
+O que aprendemos nessa aula:
+Entendemos que os contextos devem ser independentes, mas precisam se comunicar de alguma forma;
+Conhecemos o conceito de Shared Kernel, e vimos que há vantagens e desvantagens;
+Utilizamos eventos de domínio para realizar parte da comunicação entre contextos;
+Vimos que cada contexto pode fornecer seus Use Cases de forma independente.
+
 #### 22/02/2024
 
-@05-Camada anticorrupção
+@06-Camada anticorrupção
 
 @@01
 Projeto da aula anterior
